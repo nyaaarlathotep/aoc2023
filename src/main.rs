@@ -1,11 +1,17 @@
 use std::fs;
-use std::time::{Duration, Instant};
+use std::time::Instant;
+
+use crate::day01::part01;
+
+pub mod day01;
 
 fn main() {
-    let res = read_file_string("./day01/input");
+    let res = read_file_string("./src/day01/input");
     let start = Instant::now();
     match res {
-        Ok(v) => println!("{}", v),
+        Ok(v) => {
+            println!("part 1 res: {:?}", part01(v.as_str()));
+        }
         Err(e) => {
             println!("err:{e:?}")
         }
