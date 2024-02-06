@@ -1,13 +1,13 @@
 use std::fs;
 use std::time::Instant;
 
-pub mod day01;
-use crate::day01::part01;
-use crate::day01::part02;
+pub mod day02;
+use crate::day02::part01;
+use crate::day02::part02;
 
 fn main() {
-    let _test = "./src/day01/test";
-    let _input = "./src/day01/input";
+    let _test = "./src/day02/test";
+    let _input = "./src/day02/input";
     let res = read_file_string(_input);
     // let res = read_file_string(_test);
     let start = Instant::now();
