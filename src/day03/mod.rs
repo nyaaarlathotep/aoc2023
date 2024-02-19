@@ -96,7 +96,7 @@ pub fn part02(input: &str) -> i64 {
     }
     return gear_map
         .iter()
-        .map(|(k, v)| {
+        .map(|(_, v)| {
             if v.0 {
                 // println!("gear pos:{} {}, sum:{}", k.0, k.1, v.1);
                 return v.1;
