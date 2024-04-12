@@ -1,7 +1,7 @@
 use itertools::Itertools;
 
 pub fn part01(input: &str) -> i64 {
-    input
+    let res = input
         .split_once("\n")
         .map(|(t, d)| TimeRecord {
             times: t
@@ -14,14 +14,25 @@ pub fn part01(input: &str) -> i64 {
                 .collect_vec(),
         })
         .map(|r| {
-            r.times.iter().enumerate().map(|(t, &time)| {
-                let distance = r.distances.get(t).unwrap();
-                let total_time = time;
-                (0..time).map(|wait_time| wait_time)
-            });
-        });
+            println!("?");
+            let a: usize = r
+                .times
+                .into_iter()
+                .enumerate()
+                .map(|(t, time)| {
+                    let distance = r.distances.get(t).unwrap();
+                    let count: usize = (0..time)
+                        .filter(|wait_time| {
+                            return wait_time * (time - wait_time) > *distance;
+                        })
+                        .count();
+                    return count;
+                })
+                .product::<usize>();
+            return a;
+        }).unwrap() as i64;
 
-    return 0;
+    return res;
 }
 
 pub fn part02(input: &str) -> i64 {
