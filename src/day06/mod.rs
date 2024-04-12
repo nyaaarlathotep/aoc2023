@@ -1,7 +1,7 @@
 use itertools::Itertools;
 
 pub fn part01(input: &str) -> i64 {
-    let res = input
+    input
         .split_once("\n")
         .map(|(t, d)| TimeRecord {
             times: t
@@ -14,7 +14,6 @@ pub fn part01(input: &str) -> i64 {
                 .collect_vec(),
         })
         .map(|r| {
-            println!("?");
             let a: usize = r
                 .times
                 .into_iter()
@@ -30,13 +29,63 @@ pub fn part01(input: &str) -> i64 {
                 })
                 .product::<usize>();
             return a;
-        }).unwrap() as i64;
+        })
+        .unwrap() as i64
+}
 
-    return res;
+pub fn left_start(time: u64, dis: u64, left: u64, right: u64) -> u64 {
+    let mid = (left + right) / 2;
+    if mid * (time - mid) > dis && (mid - 1) * (time - (mid - 1)) < dis {
+        return mid;
+    }
+    if mid * (time - mid) > dis {
+        return left_start(time, dis, left, mid);
+    }
+
+    left_start(time, dis, mid, right)
+}
+
+pub fn right_start(time: u64, dis: u64, left: u64, right: u64) -> u64 {
+    let mid = (left + right) / 2;
+    if mid * (time - mid) > dis && (mid + 1) * (time - (mid + 1)) < dis {
+        return mid;
+    }
+    if mid * (time - mid) > dis {
+        return right_start(time, dis, mid, right);
+    }
+
+    right_start(time, dis, left, mid)
 }
 
 pub fn part02(input: &str) -> i64 {
-    return 0;
+    input
+        .split_once("\n")
+        .map(|(t, d)| {
+            let time = t
+                .split_once(':')
+                .unwrap()
+                .1
+                .chars()
+                .filter_map(|ch| ch.to_digit(10).map(u64::from))
+                .reduce(|acc, d| acc * 10 + d)
+                .unwrap();
+
+            let dis = d
+                .split_once(':')
+                .unwrap()
+                .1
+                .chars()
+                .filter_map(|ch| ch.to_digit(10).map(u64::from))
+                .reduce(|acc, d| acc * 10 + d)
+                .unwrap();
+            (time, dis)
+        })
+        .map(|(time, dis)| {
+            let l = left_start(time, dis, 0, time / 2);
+            let r = right_start(time, dis, time / 2, time);
+            r - l + 1
+        })
+        .unwrap() as i64
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
