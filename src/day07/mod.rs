@@ -29,26 +29,26 @@ pub fn part01(input: &str) -> i64 {
             } else if a.pos < b.pos {
                 return Ordering::Less;
             }
-            for i in [0..5] {
-                if a.hand.get(i.clone()) > b.hand.get(i.clone()) {
+            for i in 0..5 {
+                let a_value = num_map.get(a.hand.get(i).unwrap());
+                let b_value = num_map.get(b.hand.get(i).unwrap());
+                if a_value > b_value {
                     return Ordering::Greater;
-                } else if a.hand.get(i.clone()) < b.hand.get(i.clone()) {
+                } else if a_value < b_value {
                     return Ordering::Less;
                 }
             }
             return Ordering::Equal;
         })
-        .rev()
         .collect();
     let res: u64 = cards
         .iter()
         .enumerate()
         .map(|(i, card)| {
-            let var_name = (i+1) as u64 *card.value as u64;
-            return var_name;
+            let vvvv = (i + 1) as u64 * card.value as u64;
+            return vvvv;
         })
         .sum::<u64>();
-    println!("{:?}", cards);
     return res as i64;
 }
 
@@ -59,6 +59,7 @@ pub fn part02(input: &str) -> i64 {
 #[derive(Debug, PartialEq, Eq)]
 struct Card {
     pos: u32,
+    origin: String,
     hand: [u8; 5],
     value: u32,
 }
@@ -73,6 +74,7 @@ impl FromStr for Card {
         return Ok({
             Self {
                 pos: get_pos(a),
+                origin: a.to_string(),
                 hand: dest,
                 value: b.parse::<u32>().unwrap(),
             }
@@ -91,7 +93,7 @@ fn get_pos(s: &str) -> u32 {
     }
     let len = card_map.keys().len();
     if len == 1 {
-        return 1;
+        return 7;
     }
     if len == 2 {
         if card_map
@@ -99,14 +101,14 @@ fn get_pos(s: &str) -> u32 {
             .into_iter()
             .any(|count| return *count == 4)
         {
-            return 2;
+            return 6;
         }
         if card_map
             .values()
             .into_iter()
             .any(|count| return *count == 3)
         {
-            return 3;
+            return 5;
         }
         panic!("?{:?}", card_map)
     }
@@ -118,10 +120,10 @@ fn get_pos(s: &str) -> u32 {
         {
             return 4;
         }
-        return 5;
+        return 3;
     }
     if len == 4 {
-        return 6;
+        return 2;
     }
-    return 7;
+    return 1;
 }
