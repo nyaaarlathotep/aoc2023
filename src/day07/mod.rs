@@ -159,6 +159,7 @@ fn get_pos_part2(s: &str) -> u32 {
             card_map.insert(r, 1);
         }
     }
+    println!("before: {:?}",card_map);
     card_map.remove(&'J').map(|joker_count| {
         if joker_count==5 {
             card_map.insert('J', joker_count);
