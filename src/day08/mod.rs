@@ -57,5 +57,49 @@ impl FromStr for Network {
 }
 
 pub fn part02(input: &str) -> i64 {
-    return 0;
+    let network = input.parse::<Network>().ok().unwrap();
+    let mut steps: Vec<i64> = Vec::new();
+    for pos in network.map.keys() {
+        if pos.ends_with("A") {
+            steps.push(get_steps(&network, pos));
+        }
+    }
+    return steps.into_iter().fold(1 as i64, |a, b| {
+        return lcm(a, b);
+    });
+}
+
+fn gcd(a: i64, b: i64) -> i64 {
+    if a % b == 0 {
+        return b;
+    }
+    return gcd(b, a % b);
+}
+
+fn lcm(a: i64, b: i64) -> i64 {
+    return a * b / gcd(a, b);
+}
+
+fn get_steps(network: &Network, start: &String) -> i64 {
+    let mut steps = 0;
+    let mut pos_now = start.clone();
+    for c in network.instrcts.chars().cycle() {
+        if pos_now.ends_with("Z") {
+            return steps;
+        }
+        steps = steps + 1;
+        let next_poses = network.map.get(&pos_now).unwrap();
+        match c {
+            'L' => {
+                pos_now = next_poses.0.clone();
+            }
+            'R' => {
+                pos_now = next_poses.1.clone();
+            }
+            _ => {
+                panic!("{:?}", c);
+            }
+        }
+    }
+    unreachable!();
 }
