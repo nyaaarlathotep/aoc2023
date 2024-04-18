@@ -1,29 +1,28 @@
-use std::{collections::HashMap,  str::FromStr};
+use std::{collections::HashMap, str::FromStr};
 
 pub fn part01(input: &str) -> i64 {
     let network = input.parse::<Network>().ok().unwrap();
-    println!("{:?}", network);
     let mut steps = 0;
-    let mut pos_now = "AAA";
-    // let mut fimilar_scece: HashMap<usize, Vec<String>> = HashMap::new();
-    for c in network.instrcts.chars().cycle(){
-     if pos_now== "ZZZ" {
+    let mut pos_now = "AAA".to_string();
+    for c in network.instrcts.chars().cycle() {
+        if pos_now == "ZZZ" {
             return steps as i64;
         }
-        let next_pos=network.map.get(pos_now).unwrap();
+        steps = steps + 1;
+        let next_poses = network.map.get(&pos_now).unwrap();
         match c {
             'L' => {
-                
+                pos_now = next_poses.0.clone();
             }
-            'R' => {}
+            'R' => {
+                pos_now = next_poses.1.clone();
+            }
             _ => {
                 panic!("{:?}", c);
             }
         }
-        // pos_now=network.map.get(pos_now)
-        // fimilar_scece.get(&i).map(|vec| {});
     }
-    return 0;
+    unreachable!()
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -32,9 +31,9 @@ struct Network {
     map: HashMap<String, (String, String)>,
 }
 
-struct parseErr;
+struct ParseErr;
 impl FromStr for Network {
-    type Err = parseErr;
+    type Err = ParseErr;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut map: HashMap<String, (String, String)> = HashMap::new();
         let mut ins = "";
