@@ -39,7 +39,7 @@ mod tests {
         let res = read_file_string(test.as_str());
         match res {
             Ok(v) => {
-                // println!("part 1 res: {:?}", part01(v.as_str()));
+                println!("part 1 res: {:?}", part01(v.as_str()));
                 println!("part 2 res: {:?}", part02(v.as_str()));
             }
             Err(e) => {
