@@ -10,7 +10,6 @@ pub fn part01(input: &str) -> i64 {
         steps: 0,
     };
     input.lines().enumerate().for_each(|(i, l)| {
-        // println!("{:?}", );
         l.chars().enumerate().for_each(|(j, c)| {
             match c {
                 '.' => {}
@@ -238,5 +237,91 @@ struct Pipe {
 }
 
 pub fn part02(input: &str) -> i64 {
-    return 0;
+    let mut pipes: HashMap<(i64, i64), Pipe> = HashMap::new();
+
+    let mut start: Pipe = Pipe {
+        row: 0,
+        col: 0,
+        symbol: '?',
+        steps: 0,
+    };
+    input.lines().enumerate().for_each(|(i, l)| {
+        l.chars().enumerate().for_each(|(j, c)| {
+            match c {
+                '.' => {}
+                'S' => {
+                    let s = Pipe {
+                        row: i as i64,
+                        col: j as i64,
+                        symbol: c,
+                        steps: 0,
+                    };
+                    start = s;
+                    pipes.insert((i as i64, j as i64), s);
+                }
+                default => {
+                    pipes.insert(
+                        (i as i64, j as i64),
+                        Pipe {
+                            row: i as i64,
+                            col: j as i64,
+                            symbol: default,
+                            steps: usize::MAX,
+                        },
+                    );
+                }
+            };
+        });
+    });
+    let mut next_step: Vec<Pipe> = Vec::new();
+    match pipes.get_mut(&(start.row - 1, start.col)) {
+        Some(p) => {
+            if p.symbol == '|' || p.symbol == '7' || p.symbol == 'F' {
+                p.steps = 1;
+                next_step.push(*p);
+            }
+        }
+        _ => {}
+    }
+    match pipes.get_mut(&(start.row + 1, start.col)) {
+        Some(p) => {
+            if p.symbol == '|' || p.symbol == 'J' || p.symbol == 'L' {
+                p.steps = 1;
+                next_step.push(*p)
+            }
+        }
+        _ => {}
+    }
+    match pipes.get_mut(&(start.row, start.col - 1)) {
+        Some(p) => {
+            if p.symbol == '-' || p.symbol == 'L' || p.symbol == 'F' {
+                p.steps = 1;
+                next_step.push(*p)
+            }
+        }
+        _ => {}
+    }
+    match pipes.get_mut(&(start.row, start.col + 1)) {
+        Some(p) => {
+            if p.symbol == '-' || p.symbol == '7' || p.symbol == 'J' {
+                p.steps = 1;
+                next_step.push(*p)
+            }
+        }
+        _ => {}
+    }
+
+    let mut main_pipe: HashMap<(i64, i64), u32> = HashMap::new();
+    let mut step_now = 1;
+    loop {
+        for p in &next_step {
+            main_pipe.insert((p.row, p.col), 1);
+        }
+        (next_step, pipes) = get_biggest_step(&next_step, pipes, step_now);
+        if next_step.len() == 0 {
+            break;
+        }
+        step_now = step_now + 1;
+    };
+    return 1;
 }
