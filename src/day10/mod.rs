@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 pub fn part01(input: &str) -> i64 {
-    let mut pipes: HashMap<(i64,i64), Pipe> = HashMap::new();
+    let mut pipes: HashMap<(i64, i64), Pipe> = HashMap::new();
 
     let mut start: Pipe = Pipe {
         row: 0,
@@ -11,7 +11,7 @@ pub fn part01(input: &str) -> i64 {
     };
     input.lines().enumerate().for_each(|(i, l)| {
         // println!("{:?}", );
-        l.chars().enumerate().for_each(|(j , c)| {
+        l.chars().enumerate().for_each(|(j, c)| {
             match c {
                 '.' => {}
                 'S' => {
@@ -38,12 +38,12 @@ pub fn part01(input: &str) -> i64 {
             };
         });
     });
-    let mut first_step: Vec<Pipe> = Vec::new();
+    let mut next_step: Vec<Pipe> = Vec::new();
     match pipes.get_mut(&(start.row - 1, start.col)) {
         Some(p) => {
             if p.symbol == '|' || p.symbol == '7' || p.symbol == 'F' {
                 p.steps = 1;
-                first_step.push(*p);
+                next_step.push(*p);
             }
         }
         _ => {}
@@ -52,7 +52,7 @@ pub fn part01(input: &str) -> i64 {
         Some(p) => {
             if p.symbol == '|' || p.symbol == 'J' || p.symbol == 'L' {
                 p.steps = 1;
-                first_step.push(*p)
+                next_step.push(*p)
             }
         }
         _ => {}
@@ -61,7 +61,7 @@ pub fn part01(input: &str) -> i64 {
         Some(p) => {
             if p.symbol == '-' || p.symbol == 'L' || p.symbol == 'F' {
                 p.steps = 1;
-                first_step.push(*p)
+                next_step.push(*p)
             }
         }
         _ => {}
@@ -70,24 +70,30 @@ pub fn part01(input: &str) -> i64 {
         Some(p) => {
             if p.symbol == '-' || p.symbol == '7' || p.symbol == 'J' {
                 p.steps = 1;
-                first_step.push(*p)
+                next_step.push(*p)
             }
         }
         _ => {}
     }
 
-    let step_now = 2;
-    if let Some(value) = get_biggest_step(first_step, pipes, step_now) {
-        return value;
+    let mut step_now = 1;
+    loop {
+        (next_step, pipes) = get_biggest_step(&next_step, pipes, step_now);
+        if next_step.len() == 0 {
+            return step_now as i64;
+        }
+        step_now = step_now + 1;
     }
-    return 0;
+    // if let Some(value) = get_biggest_step(first_step, pipes, step_now) {
+    //     return value;
+    // }
 }
 
 fn get_biggest_step(
-    first_step: Vec<Pipe>,
-    mut pipes: HashMap<(i64,i64), Pipe>,
+    first_step: &Vec<Pipe>,
+    mut pipes: HashMap<(i64, i64), Pipe>,
     step_now: usize,
-) -> Option<i64> {
+) -> (Vec<Pipe>, HashMap<(i64, i64), Pipe>) {
     let mut next_step: Vec<Pipe> = Vec::new();
     for p in first_step {
         match p.symbol {
@@ -216,16 +222,17 @@ fn get_biggest_step(
             }
         }
     }
-    if next_step.len() == 0 {
-        return Some((step_now - 1) as i64);
-    }
-    return get_biggest_step(next_step, pipes, step_now + 1);
+    return (next_step, pipes);
+    // if next_step.len() == 0 {
+    //     return Some((step_now - 1) as i64);
+    // }
+    // return get_biggest_step(next_step, pipes, step_now + 1);
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 struct Pipe {
     row: i64,
-    col:i64,
+    col: i64,
     symbol: char,
     steps: usize,
 }
