@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub fn part01(input: &str) -> i64 {
     let mut pipes: HashMap<(i64, i64), Pipe> = HashMap::new();
@@ -83,9 +83,6 @@ pub fn part01(input: &str) -> i64 {
         }
         step_now = step_now + 1;
     }
-    // if let Some(value) = get_biggest_step(first_step, pipes, step_now) {
-    //     return value;
-    // }
 }
 
 fn get_biggest_step(
@@ -311,17 +308,34 @@ pub fn part02(input: &str) -> i64 {
         _ => {}
     }
 
-    let mut main_pipe: HashMap<(i64, i64), u32> = HashMap::new();
+    let mut main_pipe: HashSet<(i64, i64)> = HashSet::new();
     let mut step_now = 1;
     loop {
         for p in &next_step {
-            main_pipe.insert((p.row, p.col), 1);
+            main_pipe.insert((p.row, p.col));
         }
         (next_step, pipes) = get_biggest_step(&next_step, pipes, step_now);
         if next_step.len() == 0 {
             break;
         }
         step_now = step_now + 1;
-    };
-    return 1;
+    }
+    let mut inner_poses: Vec<(usize, usize)> = Vec::new();
+
+    input.lines().enumerate().for_each(|(i, l)| {
+        let mut inner = false;
+        l.chars().enumerate().for_each(|(j, _c)| {
+            if main_pipe.contains(&(i as i64, j as i64)) {
+                if !inner {
+                    inner = true;
+                } else {
+                    inner = false;
+                }
+            } else if inner {
+                inner_poses.push((i, j));
+            }
+        })
+    });
+
+    return inner_poses.len() as i64;
 }
