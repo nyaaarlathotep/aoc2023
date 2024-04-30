@@ -322,20 +322,38 @@ pub fn part02(input: &str) -> i64 {
     }
     let mut inner_poses: Vec<(usize, usize)> = Vec::new();
 
+    main_pipe.insert((start.row, start.col));
     input.lines().enumerate().for_each(|(i, l)| {
         let mut inner = false;
-        l.chars().enumerate().for_each(|(j, _c)| {
+        let mut inner_poses_line: Vec<(usize, usize)> = Vec::new();
+        l.chars().enumerate().for_each(|(j, c)| {
             if main_pipe.contains(&(i as i64, j as i64)) {
-                if !inner {
-                    inner = true;
-                } else {
-                    inner = false;
+                if c == '|' || c == 'F' || c == '7' {
+                    inner = !inner;
+                    inner_poses.append(&mut inner_poses_line);
                 }
             } else if inner {
-                inner_poses.push((i, j));
+                inner_poses_line.push((i, j));
             }
-        })
+        });
+        inner_poses_line.clear();
     });
+    // print_pipe(input, &inner_poses, main_pipe);
 
     return inner_poses.len() as i64;
+}
+
+fn print_pipe(input: &str, inner_poses: &Vec<(usize, usize)>, main_pipe: HashSet<(i64, i64)>) {
+    input.lines().enumerate().for_each(|(i, l)| {
+        l.chars().enumerate().for_each(|(j, c)| {
+            if inner_poses.contains(&(i, j)) {
+                print!("+ ");
+            } else if main_pipe.contains(&(i as i64, j as i64)) {
+                print!("{:} ", c)
+            } else {
+                print!("O ");
+            }
+        });
+        println!()
+    });
 }
