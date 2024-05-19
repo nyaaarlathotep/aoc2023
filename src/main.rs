@@ -34,7 +34,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_part_one() {
+    fn test() {
         let test = format!("./src/day{}/test", DAY);
         let res = read_file_string(test.as_str());
         match res {
@@ -46,5 +46,18 @@ mod tests {
                 println!("err:{e:?}")
             }
         }
+    }
+
+    #[test]
+    fn temp_test() {
+        let mut t = Vec::new();
+        t.push(1);
+        t.push(2);
+        t.push(3);
+        println!("{:?}", t);
+        println!("{:?}", &t[0..1]);
+        println!("{:?}", &t[0..t.len()]);
+        println!("{:?}", &t[2..3]);
+        println!("{:?}", &t[3..]);
     }
 }
