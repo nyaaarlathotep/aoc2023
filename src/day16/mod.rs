@@ -4,12 +4,16 @@ use std::{
 };
 
 pub fn part01(input: &str) -> Option<i64> {
-    let mut grid = Grid::from_str(input).unwrap();
     let light = Light {
         dir: Direction::East,
         i: 0,
         j: 0,
     };
+    Some(iin(input, light).unwrap() as i64)
+}
+
+fn iin(input: &str, light: Light) -> Option<usize> {
+    let mut grid = Grid::from_str(input).unwrap();
     grid.incidence(light);
     let mut total = 0;
     for i in 0..grid.height {
@@ -23,7 +27,52 @@ pub fn part01(input: &str) -> Option<i64> {
 }
 
 pub fn part02(input: &str) -> Option<i64> {
-    return Some(0);
+    let mut max: usize = 0;
+    for i in 0..109 {
+        let light = Light {
+            dir: Direction::East,
+            i: i,
+            j: 0,
+        };
+        let max_this = iin(input, light).unwrap();
+        if max_this > max {
+            max = max_this;
+        }
+    }
+    for i in 0..109 {
+        let light = Light {
+            dir: Direction::West,
+            i: i,
+            j: 109,
+        };
+        let max_this = iin(input, light).unwrap();
+        if max_this > max {
+            max = max_this;
+        }
+    }
+    for j in 0..109 {
+        let light = Light {
+            dir: Direction::South,
+            i: 0,
+            j: j,
+        };
+        let max_this = iin(input, light).unwrap();
+        if max_this > max {
+            max = max_this;
+        }
+    }
+    for j in 0..109 {
+        let light = Light {
+            dir: Direction::West,
+            i: 109,
+            j: j,
+        };
+        let max_this = iin(input, light).unwrap();
+        if max_this > max {
+            max = max_this;
+        }
+    }
+    return Some(max as i64);
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
