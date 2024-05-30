@@ -1,11 +1,11 @@
 use std::fs;
 use std::time::Instant;
 
-pub mod day16;
-use crate::day16::part01;
-use crate::day16::part02;
+pub mod day17;
+use crate::day17::part01;
+use crate::day17::part02;
 
-const DAY: &str = "16";
+const DAY: &str = "17";
 fn main() {
     let input = format!("./src/day{}/input", DAY);
     let res = read_file_string(input.as_str());
