@@ -23,7 +23,7 @@ pub fn part01(input: &str) -> Option<i64> {
 }
 
 pub fn part02(input: &str) -> Option<i64> {
-    return Some(0);
+    return Some(compute_2(input));
 }
 fn read_directions(text: &str) -> Vec<(char, i64)> {
     let regex = Regex::new(r"(?m)^([RLDU]) ([[:digit:]]+)").unwrap();
@@ -71,13 +71,4 @@ fn compute(text: &str) -> i64 {
 fn compute_2(text: &str) -> i64 {
     let dirs = read_directions_2(text);
     get_area(&dirs)
-}
-
-fn main() {
-    let text = std::fs::read_to_string("input/18.txt").unwrap();
-    let result = compute(&text);
-    println!("First = {result}");
-
-    let result = compute_2(&text);
-    println!("Second = {result}");
 }
