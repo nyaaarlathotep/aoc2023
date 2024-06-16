@@ -1,4 +1,4 @@
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
 use regex::Regex;
 
@@ -14,13 +14,13 @@ pub fn part01(input: &str) -> Option<i64> {
                 .map(|rule| {
                     if rule.contains(":") {
                         let (a, b) = rule.split_once(":").expect("!");
-                        let cmp = if rule.contains(">") { Cmp::gt } else { Cmp::lt };
+                        let cmp = if rule.contains(">") { Cmp::Gt } else { Cmp::Lt };
                         let (l, r) = match cmp {
-                            Cmp::gt => a.split_once(">").expect(">"),
-                            Cmp::lt => a.split_once("<").expect("<"),
+                            Cmp::Gt => a.split_once(">").expect(">"),
+                            Cmp::Lt => a.split_once("<").expect("<"),
                         };
                         let r = Rule {
-                            direct: true,
+                            direct: false,
                             name: l.to_string(),
                             cmp,
                             value: r.parse::<usize>().expect("usize"),
@@ -29,9 +29,9 @@ pub fn part01(input: &str) -> Option<i64> {
                         return r;
                     }
                     let r = Rule {
-                        direct: false,
-                        name: "".to_string(),
-                        cmp: Cmp::gt,
+                        direct: true,
+                        name: rule.to_string(),
+                        cmp: Cmp::Gt,
                         value: 1,
                         res: "".to_string(),
                     };
@@ -41,7 +41,7 @@ pub fn part01(input: &str) -> Option<i64> {
             rule_map.insert(cap["name"].to_string(), rules);
         });
         let regex2 = Regex::new(r"(?m)^\{(?<part>.*)\}").unwrap();
-        let mut res = 0;
+        let mut total = 0;
         regex2.captures_iter(parts).for_each(|part| {
             let a: HashMap<&str, usize> = part["part"]
                 .split(",")
@@ -50,11 +50,58 @@ pub fn part01(input: &str) -> Option<i64> {
                     return (a.0, a.1.parse::<usize>().expect("????"));
                 })
                 .collect::<HashMap<&str, usize>>();
-            println!("{:?}", &a);
+            // println!("{:?}", &a);
+
+            let next_name = "in";
+            let res = get_res(&rule_map, &next_name, &a);
+            if res == "A" {
+                let this_res = a
+                    .iter()
+                    .map(|(_k, v)| {
+                        return *v;
+                    })
+                    .sum::<usize>();
+                total += this_res;
+            }
         });
+        println!("{}",total);
+        return Some(total as i64);
     });
 
     return Some(0);
+}
+
+fn get_res<'a>(
+    rule_map: &'a HashMap<String, Vec<Rule>>,
+    next_name: &'a str,
+    part: &HashMap<&str, usize>,
+) -> &'a str {
+    if next_name == "A" || next_name == "R" {
+        return next_name;
+    }
+    let rules = rule_map.get(next_name).expect("?????");
+    for r in rules {
+        if r.direct {
+            // println!("->{}", &r.name);
+            return get_res(&rule_map, &r.name, part);
+        } else {
+            match r.cmp {
+                Cmp::Gt => {
+                    if part.get(r.name.as_str()).unwrap() > &r.value {
+                        // println!("->{}", &r.res);
+                        return get_res(&rule_map, &r.res, part);
+                    }
+                }
+                Cmp::Lt => {
+                    if part.get(r.name.as_str()).unwrap() < &r.value {
+                        // println!("->{}", &r.res);
+                        return get_res(&rule_map, &r.res, part);
+                    }
+                }
+            }
+        }
+    }
+    panic!("????");
 }
 
 pub fn part02(input: &str) -> Option<i64> {
@@ -70,13 +117,6 @@ struct Rule {
 }
 
 enum Cmp {
-    gt,
-    lt,
-}
-
-struct Part {
-    x: usize,
-    m: usize,
-    a: usize,
-    s: usize,
+    Gt,
+    Lt,
 }
