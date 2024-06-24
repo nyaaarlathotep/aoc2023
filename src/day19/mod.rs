@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use regex::Regex;
 
 pub fn part01(input: &str) -> Option<i64> {
-    input.split_once("\n\n").map(|(rules, parts)| {
+    return  input.split_once("\n\n").map(|(rules, parts)| {
         let mut rule_map: HashMap<String, Vec<Rule>> = HashMap::new();
         let regex = Regex::new(r"(?m)^(?<name>[\w+]+)\{(?<cons>.*)\}").unwrap();
         regex.captures_iter(rules).for_each(|cap| {
@@ -65,10 +65,8 @@ pub fn part01(input: &str) -> Option<i64> {
             }
         });
         println!("{}",total);
-        return Some(total as i64);
+        return total as i64;
     });
-
-    return Some(0);
 }
 
 fn get_res<'a>(
