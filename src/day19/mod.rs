@@ -103,7 +103,7 @@ fn get_res<'a>(
 }
 
 pub fn part02(input: &str) -> Option<i64> {
-    input.split_once("\n\n").map(|(rules, parts)| {
+    return input.split_once("\n\n").map(|(rules, parts)| {
         let mut rule_map: HashMap<String, Vec<Rule>> = HashMap::new();
         let regex = Regex::new(r"(?m)^(?<name>[\w+]+)\{(?<cons>.*)\}").unwrap();
         regex.captures_iter(rules).for_each(|cap| {
@@ -147,11 +147,10 @@ pub fn part02(input: &str) -> Option<i64> {
         rate_range.insert("a".to_string(), (1, 4000));
         rate_range.insert("s".to_string(), (1, 4000));
         let next_name = "in";
-        let res = get_range(rule_map, next_name, rate_range);
+        let res = get_range(&rule_map, next_name, rate_range);
 
-        return -1 as i64;
+        return res as i64;
     });
-    return Some(0);
 }
 
 fn get_range(
@@ -182,14 +181,14 @@ fn get_range(
                 Cmp::Gt => {
                     let mut value_range = rate_range.get(&r.name.to_string()).unwrap();
                     if &value_range.0 > &r.value {
-                        return total + get_range(rule_map, &r.name, rate_range);
+                        return total + get_range(rule_map, &r.res, rate_range);
                     }
                     if &r.value > &value_range.0 && &r.value < &value_range.1 {
                         let mut a = rate_range.clone();
                         let mut new_range = value_range.clone();
                         new_range.0 = r.value;
                         a.insert(r.name.to_string(), new_range);
-                        total += get_range(rule_map, next_name, a);
+                        total += get_range(rule_map, &r.res, a);
 
                         let mut range2 = value_range.clone();
                         range2.1 = r.value;
@@ -199,14 +198,14 @@ fn get_range(
                 Cmp::Lt => {
                     let mut value_range = rate_range.get(&r.name.to_string()).unwrap();
                     if &value_range.1 < &r.value {
-                        return total + get_range(rule_map, &r.name, rate_range);
+                        return total + get_range(rule_map, &r.res, rate_range);
                     }
                     if &r.value > &value_range.0 && &r.value < &value_range.1 {
                         let mut a = rate_range.clone();
                         let mut new_range = value_range.clone();
                         new_range.1 = r.value;
                         a.insert(r.name.to_string(), new_range);
-                        total += get_range(rule_map, next_name, a);
+                        total += get_range(rule_map, &r.res, a);
 
                         let mut range2 = value_range.clone();
                         range2.0 = r.value;
@@ -219,12 +218,7 @@ fn get_range(
     panic!("ttt");
 }
 
-struct RateRange {
-    x: (usize, usize),
-    m: (usize, usize),
-    a: (usize, usize),
-    s: (usize, usize),
-}
+
 
 struct Rule {
     direct: bool,
