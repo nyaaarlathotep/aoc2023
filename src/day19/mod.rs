@@ -7,8 +7,6 @@ pub fn part01(input: &str) -> Option<i64> {
         let mut rule_map: HashMap<String, Vec<Rule>> = HashMap::new();
         let regex = Regex::new(r"(?m)^(?<name>[\w+]+)\{(?<cons>.*)\}").unwrap();
         regex.captures_iter(rules).for_each(|cap| {
-            // println!("{:?}", &cap["name"]);
-            // println!("{:?}", &cap["cons"]);
             let rules = cap["cons"]
                 .split(",")
                 .map(|rule| {
@@ -50,7 +48,6 @@ pub fn part01(input: &str) -> Option<i64> {
                     return (a.0, a.1.parse::<usize>().expect("????"));
                 })
                 .collect::<HashMap<&str, usize>>();
-            // println!("{:?}", &a);
 
             let next_name = "in";
             let res = get_res(&rule_map, &next_name, &a);
@@ -80,19 +77,16 @@ fn get_res<'a>(
     let rules = rule_map.get(next_name).expect("?????");
     for r in rules {
         if r.direct {
-            // println!("->{}", &r.name);
             return get_res(&rule_map, &r.name, part);
         } else {
             match r.cmp {
                 Cmp::Gt => {
                     if part.get(r.name.as_str()).unwrap() > &r.value {
-                        // println!("->{}", &r.res);
                         return get_res(&rule_map, &r.res, part);
                     }
                 }
                 Cmp::Lt => {
                     if part.get(r.name.as_str()).unwrap() < &r.value {
-                        // println!("->{}", &r.res);
                         return get_res(&rule_map, &r.res, part);
                     }
                 }
@@ -107,8 +101,6 @@ pub fn part02(input: &str) -> Option<i64> {
         let mut rule_map: HashMap<String, Vec<Rule>> = HashMap::new();
         let regex = Regex::new(r"(?m)^(?<name>[\w+]+)\{(?<cons>.*)\}").unwrap();
         regex.captures_iter(rules).for_each(|cap| {
-            // println!("{:?}", &cap["name"]);
-            // println!("{:?}", &cap["cons"]);
             let rules = cap["cons"]
                 .split(",")
                 .map(|rule| {
@@ -164,7 +156,9 @@ fn get_range(
             .map(|(k, (low, up))| {
                 return up - low + 1;
             })
-            .sum();
+            .fold(1, |acc, n| {
+                return acc * n;
+            });
         return total;
     }
     if next_name == "R" {
@@ -174,19 +168,18 @@ fn get_range(
     let mut total = 0;
     for r in rules {
         if r.direct {
-            // println!("->{}", &r.name);
             return total + get_range(rule_map, &r.name, rate_range);
         } else {
             match r.cmp {
                 Cmp::Gt => {
-                    let mut value_range = rate_range.get(&r.name.to_string()).unwrap();
+                    let value_range = rate_range.get(&r.name.to_string()).unwrap();
                     if &value_range.0 > &r.value {
                         return total + get_range(rule_map, &r.res, rate_range);
                     }
                     if &r.value > &value_range.0 && &r.value < &value_range.1 {
                         let mut a = rate_range.clone();
                         let mut new_range = value_range.clone();
-                        new_range.0 = r.value;
+                        new_range.0 = r.value + 1;
                         a.insert(r.name.to_string(), new_range);
                         total += get_range(rule_map, &r.res, a);
 
@@ -196,14 +189,14 @@ fn get_range(
                     }
                 }
                 Cmp::Lt => {
-                    let mut value_range = rate_range.get(&r.name.to_string()).unwrap();
+                    let value_range = rate_range.get(&r.name.to_string()).unwrap();
                     if &value_range.1 < &r.value {
                         return total + get_range(rule_map, &r.res, rate_range);
                     }
                     if &r.value > &value_range.0 && &r.value < &value_range.1 {
                         let mut a = rate_range.clone();
                         let mut new_range = value_range.clone();
-                        new_range.1 = r.value;
+                        new_range.1 = r.value - 1;
                         a.insert(r.name.to_string(), new_range);
                         total += get_range(rule_map, &r.res, a);
 
@@ -217,8 +210,6 @@ fn get_range(
     }
     panic!("ttt");
 }
-
-
 
 struct Rule {
     direct: bool,
