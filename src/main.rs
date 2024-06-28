@@ -31,6 +31,8 @@ fn read_file_string(filepath: &str) -> Result<String, Box<dyn std::error::Error>
 
 #[cfg(test)]
 mod tests {
+    use linked_hash_map::LinkedHashMap;
+
     use super::*;
 
     #[test]
@@ -50,6 +52,15 @@ mod tests {
 
     #[test]
     fn temp_test() {
-
+        let mut a = LinkedHashMap::new();
+        a.insert(1, 1);
+        a.insert(2, 2);
+        a.insert(3, 3);
+        println!("{:?}", a.pop_front().unwrap());
+        a.entry(2)
+            .and_modify(|n| {
+                *n += 5;
+            });
+        println!("{:?}", a.pop_front().unwrap());
     }
 }
