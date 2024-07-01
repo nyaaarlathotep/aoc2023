@@ -144,7 +144,7 @@ pub fn part02(input: &str) -> Option<i64> {
         panic!("no start");
     }
     let s = start.unwrap();
-    let total_step = 64;
+    let total_step = 10;
     let moves = get_move_part2(s, total_step, map);
 
     return Some(moves as i64);
@@ -159,7 +159,7 @@ fn get_move_part2(s: (usize, usize), total_step: i32, map: Vec<Vec<&str>>) -> us
         if start_pos.len() == 0 {
             break;
         }
-        // print_map(step, &map, &even_pos, &odd_pos);
+        print_map_part2(step, &map, &even_pos, &odd_pos);
         let next_step_pos = walk_part2(&start_pos, &map, step, &mut even_pos, &mut odd_pos);
         start_pos = next_step_pos;
     }
@@ -214,11 +214,11 @@ fn get_legal_neighbors_part2(
     if j == j_max && map[i][0] != ROCK {
         neighbors.push(((map_pos.0, map_pos.1 + 1), i, 0));
     }
-    if i > 0 && map[i - 1][s.1] != ROCK {
+    if i > 0 && map[i - 1][j] != ROCK {
         neighbors.push((map_pos, i - 1, j));
     }
-    if i + 1 < map.len() && map[i + 1][s.1] != ROCK {
-        neighbors.push((map_pos, i + 1, s.1));
+    if i + 1 < map.len() && map[i + 1][j] != ROCK {
+        neighbors.push((map_pos, i + 1, j));
     }
     if j > 0 && map[i][j - 1] != ROCK {
         neighbors.push((map_pos, i, j - 1));
@@ -227,4 +227,32 @@ fn get_legal_neighbors_part2(
         neighbors.push((map_pos, i, j + 1));
     }
     neighbors
+}
+fn print_map_part2(
+    step: usize,
+    map: &Vec<Vec<&str>>,
+    even_pos: &HashSet<((i64, i64), usize, usize)>,
+    odd_pos: &HashSet<((i64, i64), usize, usize)>,
+) {
+    let n = step % 2;
+    map.iter().enumerate().for_each(|(i, line)| {
+        line.iter().enumerate().for_each(|(j, s)| {
+            if n == 1 {
+                if even_pos.contains(&((0, 0), i, j)) {
+                    print!("{}", "O");
+                } else {
+                    print!("{}", s);
+                }
+            }
+            if n == 0 {
+                if odd_pos.contains(&((0, 0), i, j)) {
+                    print!("{}", "O");
+                } else {
+                    print!("{}", s);
+                }
+            }
+        });
+        println!("")
+    });
+    println!("---------------------------");
 }

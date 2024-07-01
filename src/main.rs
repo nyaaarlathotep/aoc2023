@@ -50,8 +50,5 @@ mod tests {
 
     #[test]
     fn temp_test() {
-        for i in 0..=64 as usize {
-            println!("{}", i)
-        }
     }
 }
