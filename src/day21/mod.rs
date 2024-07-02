@@ -129,6 +129,9 @@ pub fn part02(input: &str) -> Option<i64> {
             let line: Vec<&str> = l
                 .split("")
                 .into_iter()
+                .filter(|s|{
+                    return s.len()!=0;
+                })
                 .enumerate()
                 .map(|(j, c)| {
                     if c == "S" {
@@ -144,7 +147,7 @@ pub fn part02(input: &str) -> Option<i64> {
         panic!("no start");
     }
     let s = start.unwrap();
-    let total_step = 10;
+    let total_step = 1000;
     let moves = get_move_part2(s, total_step, map);
 
     return Some(moves as i64);
@@ -159,7 +162,7 @@ fn get_move_part2(s: (usize, usize), total_step: i32, map: Vec<Vec<&str>>) -> us
         if start_pos.len() == 0 {
             break;
         }
-        print_map_part2(step, &map, &even_pos, &odd_pos);
+        // print_map_part2(step, &map, &even_pos, &odd_pos);
         let next_step_pos = walk_part2(&start_pos, &map, step, &mut even_pos, &mut odd_pos);
         start_pos = next_step_pos;
     }
@@ -217,13 +220,13 @@ fn get_legal_neighbors_part2(
     if i > 0 && map[i - 1][j] != ROCK {
         neighbors.push((map_pos, i - 1, j));
     }
-    if i + 1 < map.len() && map[i + 1][j] != ROCK {
+    if i < i_max && map[i + 1][j] != ROCK {
         neighbors.push((map_pos, i + 1, j));
     }
     if j > 0 && map[i][j - 1] != ROCK {
         neighbors.push((map_pos, i, j - 1));
     }
-    if j + 1 < map[0].len() && map[i][j + 1] != ROCK {
+    if j < j_max && map[i][j + 1] != ROCK {
         neighbors.push((map_pos, i, j + 1));
     }
     neighbors
@@ -236,6 +239,7 @@ fn print_map_part2(
 ) {
     let n = step % 2;
     map.iter().enumerate().for_each(|(i, line)| {
+        print!("{}: ",line.len());
         line.iter().enumerate().for_each(|(j, s)| {
             if n == 1 {
                 if even_pos.contains(&((0, 0), i, j)) {
