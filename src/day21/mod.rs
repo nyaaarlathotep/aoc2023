@@ -1,3 +1,5 @@
+// https://github.com/villuna/aoc23/wiki/A-Geometric-solution-to-advent-of-code-2023,-day-21
+// thanks reddit. Hidden infomation I will never find out by myself. Diamond!
 use std::collections::HashSet;
 
 const ROCK: &str = "#";
@@ -27,12 +29,12 @@ pub fn part01(input: &str) -> Option<i64> {
     }
     let s = start.unwrap();
     let total_step = 64;
-    let moves = get_move(s, total_step, map);
+    let moves = get_move(s, total_step, &map);
 
     return Some(moves as i64);
 }
 
-fn get_move(s: (usize, usize), total_step: i32, map: Vec<Vec<&str>>) -> usize {
+fn get_move(s: (usize, usize), total_step: i32, map: &Vec<Vec<&str>>) -> usize {
     let mut even_pos: HashSet<(usize, usize)> = HashSet::new();
     let mut odd_pos: HashSet<(usize, usize)> = HashSet::new();
     let mut start_pos = Vec::new();
@@ -129,8 +131,8 @@ pub fn part02(input: &str) -> Option<i64> {
             let line: Vec<&str> = l
                 .split("")
                 .into_iter()
-                .filter(|s|{
-                    return s.len()!=0;
+                .filter(|s| {
+                    return s.len() != 0;
                 })
                 .enumerate()
                 .map(|(j, c)| {
@@ -148,12 +150,32 @@ pub fn part02(input: &str) -> Option<i64> {
     }
     let s = start.unwrap();
     let total_step = 1000;
-    let moves = get_move_part2(s, total_step, map);
+    let moves = get_move_part2(s, total_step, &map);
 
-    return Some(moves as i64);
+    let y_0 = get_move_part2(s, 65, &map);
+    println!("131*0 + 65 = {y_0}");
+
+    let y_1 = get_move_part2(s, 65 + 131, &map);
+    println!("131*1 + 65 = {y_1}");
+
+    let y_2 = get_move_part2(s, 65 + 131 * 2, &map);
+    println!("131*2 + 65 = {y_2}");
+
+    let a2 = y_2 - 2 * y_1 + y_0;
+    let b2 = 4 * y_1 - 3 * y_0 - y_2;
+    let c = y_0;
+
+    println!("{a2}/2 x^2 +{b2}/2 x + {c} = y");
+    println!("x=0, y={c}");
+    println!("x=1, y={}", (a2 + b2) / 2 + c);
+    println!("x=2, y={}", (4 * a2 + 2 * b2) / 2 + c);
+    let res = (202_300 * 202_300 * a2 + 202_300 * b2) / 2 + c;
+    println!("x=202300, y={}", res);
+
+    return Some(res as i64);
 }
 
-fn get_move_part2(s: (usize, usize), total_step: i32, map: Vec<Vec<&str>>) -> usize {
+fn get_move_part2(s: (usize, usize), total_step: i32, map: &Vec<Vec<&str>>) -> usize {
     let mut even_pos: HashSet<((i64, i64), usize, usize)> = HashSet::new();
     let mut odd_pos: HashSet<((i64, i64), usize, usize)> = HashSet::new();
     let mut start_pos = Vec::new();
@@ -166,8 +188,11 @@ fn get_move_part2(s: (usize, usize), total_step: i32, map: Vec<Vec<&str>>) -> us
         let next_step_pos = walk_part2(&start_pos, &map, step, &mut even_pos, &mut odd_pos);
         start_pos = next_step_pos;
     }
-    let moves = odd_pos.len();
-    moves
+    if total_step % 2 == 0 {
+        odd_pos.len()
+    } else {
+        even_pos.len()
+    }
 }
 
 fn walk_part2(
@@ -239,7 +264,7 @@ fn print_map_part2(
 ) {
     let n = step % 2;
     map.iter().enumerate().for_each(|(i, line)| {
-        print!("{}: ",line.len());
+        print!("{}: ", line.len());
         line.iter().enumerate().for_each(|(j, s)| {
             if n == 1 {
                 if even_pos.contains(&((0, 0), i, j)) {
