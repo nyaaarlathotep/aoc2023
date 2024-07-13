@@ -146,33 +146,17 @@ fn walk_part2(
 fn get_legal_neighbors_part2(s: &Coordinate, map: &Vec<Vec<MapNode>>) -> Vec<(Coordinate, usize)> {
     let mut neighbors = Vec::new();
     if s.x > 0 && map[s.x - 1][s.y].mark != ROCK && map[s.x - 1][s.y].mark != VISITED {
-        if map[s.x - 1][s.y].mark == b'^' {
-            neighbors.push((Coordinate::new(s.x - 2, s.y), 2));
-        } else {
-            neighbors.push((Coordinate::new(s.x - 1, s.y), 1));
-        }
+        neighbors.push((Coordinate::new(s.x - 1, s.y), 1));
     }
     if s.x + 1 < map.len() && map[s.x + 1][s.y].mark != ROCK && map[s.x + 1][s.y].mark != VISITED {
-        if map[s.x + 1][s.y].mark == b'v' {
-            neighbors.push((Coordinate::new(s.x + 2, s.y), 2));
-        } else {
-            neighbors.push((Coordinate::new(s.x + 1, s.y), 1));
-        }
+        neighbors.push((Coordinate::new(s.x + 1, s.y), 1));
     }
     if s.y > 0 && map[s.x][s.y - 1].mark != ROCK && map[s.x][s.y - 1].mark != VISITED {
-        if map[s.x][s.y - 1].mark == b'<' {
-            neighbors.push((Coordinate::new(s.x, s.y - 2), 2));
-        } else {
-            neighbors.push((Coordinate::new(s.x, s.y - 1), 1));
-        }
+        neighbors.push((Coordinate::new(s.x, s.y - 1), 1));
     }
     if s.y + 1 < map[0].len() && map[s.x][s.y + 1].mark != ROCK && map[s.x][s.y + 1].mark != VISITED
     {
-        if map[s.x][s.y + 1].mark == b'>' {
-            neighbors.push((Coordinate::new(s.x, s.y + 2), 2));
-        } else {
-            neighbors.push((Coordinate::new(s.x, s.y + 1), 1));
-        }
+        neighbors.push((Coordinate::new(s.x, s.y + 1), 1));
     }
     neighbors
 }
