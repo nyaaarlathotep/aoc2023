@@ -1,5 +1,6 @@
+// copied. Maybe I'd learn to ignore the efficiency. Today's puzzle is a good example.
 use std::{
-    fmt::{Debug, Display},
+    fmt::Debug,
     str::FromStr,
     usize,
 };
@@ -157,5 +158,32 @@ fn adjust_blocks(blocks: &mut Vec<Block>) {
 }
 
 pub fn part02(input: &str) -> Option<i64> {
-    return Some(0);
+    let mut blocks: Vec<Block> = input
+        .lines()
+        .map(|s| {
+            return s.parse::<Block>().ok().unwrap();
+        })
+        .collect();
+
+    blocks.sort();
+    adjust_blocks(&mut blocks);
+    let res = count(&blocks);
+
+    return Some(res as i64);
+}
+
+fn count(blocks: &Vec<Block>) -> usize {
+    blocks
+        .into_iter()
+        .map(|b| {
+            let mut new_blocks: Vec<Block> = blocks.iter().filter(|x| *x != b).cloned().collect();
+            adjust_blocks(&mut new_blocks);
+            blocks
+                .iter()
+                .filter(|x| *x != b)
+                .zip(new_blocks.iter())
+                .filter(|(x, y)| **x != **y)
+                .count()
+        })
+        .sum::<usize>()
 }
