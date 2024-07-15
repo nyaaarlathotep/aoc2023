@@ -11,12 +11,15 @@ struct Point {
 
 impl Debug for Point {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Point").field("name", &self.name).finish()
+        f.debug_struct("Point")
+            .field("name", &self.name)
+            .field("to", &self.to)
+            .finish()
     }
 }
 
 pub fn part01(input: &str) -> Option<i64> {
-    let points: Vec<Point> = input
+    let point_map = input
         .lines()
         .map(|line| {
             let (l, r) = line.split_once(": ").unwrap();
@@ -25,9 +28,56 @@ pub fn part01(input: &str) -> Option<i64> {
                 name: l.to_string(),
                 to,
             };
-            return p;
+            return (l.to_string(), p);
         })
-        .collect::<Vec<Point>>();
+        .collect::<HashMap<String, Point>>();
+    let mut new_map = HashMap::new();
+    for p in point_map.values() {
+        match new_map.entry(&p.name) {
+            std::collections::hash_map::Entry::Occupied(mut entry) => {
+                let new_p: &mut Point = entry.get_mut();
+
+                for to in &p.to {
+                    if !new_p.to.contains(to) {
+                        new_p.to.push(to.clone());
+                    };
+                }
+            }
+            std::collections::hash_map::Entry::Vacant(entry) => {
+                let mut end_to = Vec::new();
+                for to in &p.to {
+                    if !end_to.contains(to) {
+                        end_to.push(to.clone());
+                    };
+                }
+                entry.insert(Point {
+                    name: p.name.clone(),
+                    to: end_to,
+                });
+            }
+        }
+        for to in &p.to {
+            match new_map.entry(to) {
+                std::collections::hash_map::Entry::Occupied(mut entry) => {
+                    let end: &mut Point = entry.get_mut();
+                    if !end.to.contains(&p.name) {
+                        end.to.push(p.name.clone());
+                    }
+                }
+                std::collections::hash_map::Entry::Vacant(entry) => {
+                    let mut end_to = Vec::new();
+                    end_to.push(p.name.clone());
+                    entry.insert(Point {
+                        name: to.clone(),
+                        to: end_to,
+                    });
+                }
+            }
+        }
+    }
+    let points: Vec<Point> = new_map.values().cloned().collect();
+    // println!("{:?}", &points);
+
     let p = &points[0];
     let mut l = HashMap::new();
     l.insert(p.name.as_str(), p);
@@ -44,27 +94,11 @@ fn cut<'a>(
         let mut connects = HashSet::new();
         l.iter()
             .flat_map(|(k, v)| {
-                let t:Vec<(String,String)> =
-                    v.to.iter()
-                        .flat_map(|name| {
-                            if let Some(r_name) = r.get(name.as_str()) {
-                                return Some((name.clone(), r_name.name.clone()));
-                            }
-                            None
-                        })
-                        .collect();
-                t
-            })
-            .for_each(|t| {
-                connects.insert(t);
-            });
-        r.iter()
-            .flat_map(|(k, v)| {
                 let t: Vec<(String, String)> =
                     v.to.iter()
-                        .filter_map(|name| {
-                            if let Some(l_name) = l.get(name.as_str()) {
-                                return Some((l_name.name.clone(), name.clone()));
+                        .flat_map(|r_name| {
+                            if r.contains_key(r_name.as_str()) {
+                                return Some((k.to_string(), r_name.clone()));
                             }
                             None
                         })
@@ -75,7 +109,8 @@ fn cut<'a>(
                 connects.insert(t);
             });
         if connects.len() == 3 {
-            println!("{:?}\n{:?}", &l.values(), &r.values());
+            // println!("{:?}\n{:?}", &l.values(), &r.values());
+            println!("{:?}", &connects);
             return l.len() * r.len();
         }
         return 0;
@@ -90,7 +125,7 @@ fn cut<'a>(
     r.insert(&next_p.name, next_p);
     let add_r = cut(&points[1..], l, r);
     if add_r != 0 {
-        return add_l;
+        return add_r;
     }
     r.remove(next_p.name.as_str());
     0
